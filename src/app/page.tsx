@@ -4,11 +4,12 @@ import { LoaderCircleIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { db } from "@/lib/database";
+import { db, queries } from "@/lib/database";
 import { Resolutions } from "@/schemas/goal";
+import Link from "next/link";
 
 interface GoalEntry {
   id: string;
@@ -25,6 +26,7 @@ const defaultGoals: GoalEntry[] = [
 export default function Home() {
   const router = useRouter();
   const [goals, setGoals] = useState<GoalEntry[]>(defaultGoals);
+  const { data: existingResolutions } = useQuery(queries.resolutions);
 
   const addGoal = () =>
     setGoals((prev) => [
@@ -80,6 +82,14 @@ export default function Home() {
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10">
       <div className="w-full max-w-sm">
         <div className={cn("flex flex-col gap-6")}>
+          {existingResolutions?.goals.length ? (
+            <Link
+              href="/resolutions"
+              className="mb-4 inline-flex justify-end items-center text-sm text-muted-foreground hover:text-foreground"
+            >
+              → View saved resolutions
+            </Link>
+          ) : null}
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center gap-2">

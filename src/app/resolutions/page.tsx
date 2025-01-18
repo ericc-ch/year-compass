@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { db, queries } from "@/lib/database";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -62,6 +63,12 @@ export default function Resolutions() {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10">
       <div className="w-full max-w-md">
+        <Link
+          href="/"
+          className="mb-4 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
+        >
+          ← Back
+        </Link>
         <div className={cn("flex flex-col gap-6")}>
           <div className="flex flex-col gap-6">
             <div className="flex flex-col items-center gap-2">
