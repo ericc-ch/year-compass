@@ -5,10 +5,23 @@ import { db, queries } from "@/lib/database";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
+import { toast } from "sonner";
 
 export default function Resolutions() {
   const queryClient = useQueryClient();
   const { data: resolutions, isLoading } = useQuery(queries.resolutions);
+
+  const showMilestoneMessage = (progress: number) => {
+    if (progress === 100) {
+      toast.success("Incredible! You've completed all steps! 🎉");
+    } else if (progress >= 75) {
+      toast.success("Almost there! You're doing amazing! 🌟");
+    } else if (progress >= 50) {
+      toast.success("Halfway through! Keep up the great work! 💪");
+    } else if (progress >= 25) {
+      toast.success("Great start! You're making progress! 🌱");
+    }
+  };
 
   const updateStepMutation = useMutation({
     mutationFn: async ({
@@ -22,8 +35,13 @@ export default function Resolutions() {
     }) => {
       await db.updateStep(goalIndex, stepIndex, isCompleted);
     },
-    onSuccess: () => {
+    onSuccess: (_, { goalIndex }) => {
       queryClient.invalidateQueries({ queryKey: queries.resolutions.queryKey });
+
+      if (resolutions?.goals[goalIndex]) {
+        const progress = calculateProgress(resolutions.goals[goalIndex].steps);
+        showMilestoneMessage(progress);
+      }
     },
   });
 
