@@ -1,10 +1,5 @@
 import localforage from "localforage";
-
-// Types for our data model
-export type Step = {
-  text: string;
-  isCompleted: boolean;
-};
+import { Resolutions } from "../schemas/goal";
 
 // Initialize localforage
 localforage.config({
@@ -14,85 +9,50 @@ localforage.config({
 
 // Type-safe database keys
 const keys = {
-  currentResolution: "currentResolution",
-  resolutionSteps: "resolutionSteps",
+  resolutions: "resolutions",
   reminderNote: "reminderNote",
 } as const;
 
 // Type-safe database operations
 export const db = {
-  // Get current resolution
-  getCurrentResolution: async () => {
+  // Get all resolutions
+  getResolutions: async (): Promise<Resolutions | null> => {
     try {
-      return await localforage.getItem<string>(keys.currentResolution);
+      return await localforage.getItem<Resolutions>(keys.resolutions);
     } catch (error) {
-      console.error("Failed to get current resolution:", error);
+      console.error("Failed to get resolutions:", error);
       throw error;
     }
   },
 
-  // Set current resolution
-  setCurrentResolution: async (resolution: string) => {
+  // Set all resolutions
+  setResolutions: async (resolutions: Resolutions) => {
     try {
-      await localforage.setItem(keys.currentResolution, resolution);
+      await localforage.setItem(keys.resolutions, resolutions);
     } catch (error) {
-      console.error("Failed to set current resolution:", error);
+      console.error("Failed to set resolutions:", error);
       throw error;
     }
   },
 
-  // Get all steps
-  getSteps: async () => {
+  // Update a single step in a goal
+  updateStep: async (
+    goalIndex: number,
+    stepIndex: number,
+    isCompleted: boolean
+  ) => {
     try {
-      const steps = await localforage.getItem<Step[]>(keys.resolutionSteps);
-      return steps || [];
-    } catch (error) {
-      console.error("Failed to get steps:", error);
-      throw error;
-    }
-  },
-
-  // Set all steps
-  setSteps: async (steps: Step[]) => {
-    try {
-      await localforage.setItem(keys.resolutionSteps, steps);
-    } catch (error) {
-      console.error("Failed to set steps:", error);
-      throw error;
-    }
-  },
-
-  // Update a single step
-  updateStep: async (index: number, isCompleted: boolean) => {
-    try {
-      const steps = await db.getSteps();
-      if (!steps[index]) {
+      const resolutions = await db.getResolutions();
+      if (!resolutions?.goals[goalIndex]) {
+        throw new Error("Goal not found");
+      }
+      if (!resolutions.goals[goalIndex].steps[stepIndex]) {
         throw new Error("Step not found");
       }
-      steps[index].isCompleted = isCompleted;
-      await db.setSteps(steps);
+      resolutions.goals[goalIndex].steps[stepIndex].isCompleted = isCompleted;
+      await db.setResolutions(resolutions);
     } catch (error) {
       console.error("Failed to update step:", error);
-      throw error;
-    }
-  },
-
-  // Get reminder note
-  getReminderNote: async () => {
-    try {
-      return await localforage.getItem<string>(keys.reminderNote);
-    } catch (error) {
-      console.error("Failed to get reminder note:", error);
-      throw error;
-    }
-  },
-
-  // Set reminder note
-  setReminderNote: async (note: string) => {
-    try {
-      await localforage.setItem(keys.reminderNote, note);
-    } catch (error) {
-      console.error("Failed to set reminder note:", error);
       throw error;
     }
   },

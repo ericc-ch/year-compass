@@ -1,12 +1,14 @@
 "use client";
 
 import { LoaderCircleIcon, PlusIcon, TrashIcon } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { db } from "@/lib/database";
+import { Resolutions } from "@/schemas/goal";
 
 interface GoalEntry {
   id: string;
@@ -21,6 +23,7 @@ const defaultGoals: GoalEntry[] = [
 ];
 
 export default function Home() {
+  const router = useRouter();
   const [goals, setGoals] = useState<GoalEntry[]>(defaultGoals);
 
   const addGoal = () =>
@@ -49,7 +52,7 @@ export default function Home() {
         }),
       });
 
-      return response.json();
+      return response.json() as Promise<Resolutions>;
     },
   });
 
@@ -57,8 +60,14 @@ export default function Home() {
     e.preventDefault();
 
     mutation.mutate(goals, {
-      onSuccess: (data) => {
-        console.log(data);
+      onSuccess: async (data) => {
+        try {
+          await db.setResolutions(data);
+          router.push("/resolutions");
+        } catch (error) {
+          console.error("Failed to save resolutions:", error);
+          alert("Failed to save your resolutions. Please try again.");
+        }
       },
       onError: (error) => {
         console.error(error);
