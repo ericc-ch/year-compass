@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 
 interface GoalEntry {
   id: string;
@@ -39,11 +40,38 @@ export default function Home() {
       prev.map((goal) => (goal.id === id ? { ...goal, value } : goal))
     );
 
+  const mutation = useMutation({
+    mutationFn: async (goals: GoalEntry[]) => {
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        body: JSON.stringify({
+          goals: goals.map((goal) => goal.value),
+        }),
+      });
+
+      return response.json();
+    },
+  });
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    mutation.mutate(goals, {
+      onSuccess: (data) => {
+        console.log(data);
+      },
+      onError: (error) => {
+        console.error(error);
+        alert("An error occurred. Please try again.");
+      },
+    });
+  };
+
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10">
       <div className="w-full max-w-sm">
         <div className={cn("flex flex-col gap-6")}>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center gap-2">
                 <h1 className="text-5xl font-extrabold tracking-tight">
