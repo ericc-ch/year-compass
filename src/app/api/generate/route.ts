@@ -220,5 +220,7 @@ export async function POST(request: Request) {
   //   },
   // });
 
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
   return Response.json({ data: mockResponse });
 }
