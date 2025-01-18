@@ -13,11 +13,20 @@ export const goalSchema = z.object({
     .describe("An array of steps to achieve the goal"),
 });
 
-export type Goal = z.infer<typeof goalSchema>;
-export type GoalInput = Omit<Goal, "steps">;
+export type Step = {
+  step: string;
+  isCompleted: boolean;
+};
+
+export type Goal = {
+  goal: string;
+  steps: Step[];
+};
+
+export type Resolutions = {
+  goals: Goal[];
+};
 
 export const resolutionsSchema = z.object({
   goals: z.array(goalSchema).min(1).describe("An array of goals with steps"),
 });
-
-export type Resolutions = z.infer<typeof resolutionsSchema>;

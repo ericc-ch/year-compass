@@ -75,7 +75,6 @@ export const queries = {
     queryFn: async () => {
       const data = await db.getResolutions();
 
-      console.log("data", data);
       return data ?? { goals: [] };
     },
   }),
