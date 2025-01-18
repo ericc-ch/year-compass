@@ -1,5 +1,6 @@
 import localforage from "localforage";
 import { Resolutions } from "../schemas/goal";
+import { queryOptions } from "@tanstack/react-query";
 
 // Initialize localforage
 localforage.config({
@@ -67,3 +68,15 @@ export const db = {
     }
   },
 };
+
+export const queries = {
+  resolutions: queryOptions({
+    queryKey: ["resolutions"] as const,
+    queryFn: async () => {
+      const data = await db.getResolutions();
+
+      console.log("data", data);
+      return data ?? { goals: [] };
+    },
+  }),
+} as const;

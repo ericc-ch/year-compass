@@ -52,7 +52,7 @@ export default function Home() {
         }),
       });
 
-      return response.json() as Promise<Resolutions>;
+      return response.json() as Promise<{ data: Resolutions }>;
     },
   });
 
@@ -62,7 +62,7 @@ export default function Home() {
     mutation.mutate(goals, {
       onSuccess: async (data) => {
         try {
-          await db.setResolutions(data);
+          await db.setResolutions(data.data);
           router.push("/resolutions");
         } catch (error) {
           console.error("Failed to save resolutions:", error);
