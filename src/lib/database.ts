@@ -6,6 +6,7 @@ import { queryOptions } from "@tanstack/react-query";
 localforage.config({
   name: "year-compass",
   storeName: "resolutions",
+  driver: localforage.LOCALSTORAGE,
 });
 
 // Type-safe database keys

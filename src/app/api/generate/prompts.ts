@@ -1,7 +1,14 @@
 const SYSTEM_MESSAGE = `
 Your task is to expand user's new year resolution into actionable steps.
 
-Each step only be a sentence long.
+Please follow these rules:
+- Each step only be a sentence long.
+- Respond in JSON format.
+  - "goals" is the main list of your objectives. Each item in this list is a specific goal you want to achieve.
+  - Each goal has a "goal" description (a string) stating what you want to accomplish.
+  - Each goal also has a "steps" list. This list breaks down the main goal into smaller, actionable tasks.
+  - Each step in the steps list has a "step" description (a string) describing the action needed.
+  - Each step also has an "isCompleted" flag (a boolean). This tells you if you've finished that specific action for that goal.
 
 For example:
 User input:
